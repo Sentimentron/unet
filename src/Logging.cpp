@@ -24,21 +24,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __H__UNET__
-#define __H__UNET__
-
 #include <cstdarg>
+#include <pthread.h>
+#include <stdio.h>
 
-namespace unet {
+#include <unet/unet.hpp>
 
-    enum LogLevel {DEBUG, INFO, ERROR, FATAL};
+using namespace unet;
 
-    typedef void (*UserLoggingFunction)(LogLevel,const char* fmt, va_list args);
+static UserLoggingFunction userLogFunction;
+static pthread_mutex_t uNetConfigurationLock = PTHREAD_MUTEX_INITIALIZER;
 
-    // Set a new default logging function, and return a pointer to the previous
-    // one, if defined.
-    UserLoggingFunction SetCustomLoggingFunction(UserLoggingFunction f); 
+/// Set a new default logging function and return a pointer to the
+/// previous one.
+UserLoggingFunction SetCustomLoggingFunction(UserLoggingFunction f) {
+    UserLoggingFunction ret = nullptr;
+    pthread_mutex_lock(&uNetConfigurationLock);
+    ret = userLogFunction;
+    userLogFunction = f;
+    pthread_mutex_unlock(&uNetConfigurationLock);
+    return ret;
 
 }
 
-#endif
+static const char *LogLevelToString(LogLevel l) {
+    switch(l) {
+        case DEBUG:
+            return "DEBUG";
+        case INFO:
+            return "INFO";
+        case ERROR:
+            return "ERROR";
+        case FATAL:
+            return "FATAL";
+        default:
+            return "UNKNOWN";
+    }
+}
+
+void Log(LogLevel l, const char *fmt...) {
+
+    va_list args;
+    va_start(args, fmt);
+
+    if (userLogFunction != nullptr) {
+        userLogFunction(l, fmt, args);
+    } else {
+        fprintf(stderr, "μNet/%s", LogLevelToString(l));
+        vfprintf(stderr, fmt, args);
+    }
+
+    va_end(args);
+}

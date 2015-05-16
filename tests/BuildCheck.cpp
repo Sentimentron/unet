@@ -24,21 +24,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __H__UNET__
-#define __H__UNET__
+///
+/// This program deliberately does nothing. It exists to check whether the
+/// build system functions correctly.
+///
 
-#include <cstdarg>
+#include <unet/unet.hpp>
 
-namespace unet {
-
-    enum LogLevel {DEBUG, INFO, ERROR, FATAL};
-
-    typedef void (*UserLoggingFunction)(LogLevel,const char* fmt, va_list args);
-
-    // Set a new default logging function, and return a pointer to the previous
-    // one, if defined.
-    UserLoggingFunction SetCustomLoggingFunction(UserLoggingFunction f); 
-
+int main(int argc, char **argv) {
+    return 0;
 }
-
-#endif

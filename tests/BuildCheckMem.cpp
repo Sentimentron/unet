@@ -24,21 +24,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __H__UNET__
-#define __H__UNET__
+///
+/// This program deliberately does nothing. It checks whether the test setup
+/// is working correctly.
+///
 
-#include <cstdarg>
+#include <unet/unet.hpp>
+#include <stdlib.h>
+#include <stdio.h>
 
-namespace unet {
-
-    enum LogLevel {DEBUG, INFO, ERROR, FATAL};
-
-    typedef void (*UserLoggingFunction)(LogLevel,const char* fmt, va_list args);
-
-    // Set a new default logging function, and return a pointer to the previous
-    // one, if defined.
-    UserLoggingFunction SetCustomLoggingFunction(UserLoggingFunction f); 
-
+int main(int argc, char **argv) {
+    void *alloc = malloc(1024);
+    if (alloc == nullptr) {
+        fprintf(stderr, "Allocation failed!\n");
+        return 1;
+    }
+    free(alloc);
+    return 0;
 }
-
-#endif
