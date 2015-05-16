@@ -28,8 +28,8 @@ enable_testing()
 function(add_test_binary name)
     add_executable(test_${name} ${name}.cpp)
     add_executable(test_${name}_s ${name}.cpp)
-    target_link_libraries(test_${name} ${UNET_LIBRARIES} libunet)
-    target_link_libraries(test_${name}_s ${UNET_LIBRARIES} libunets)
+    target_link_libraries(test_${name} ${UNET_LIBRARIES} unet)
+    target_link_libraries(test_${name}_s ${UNET_LIBRARIES} unets)
 endfunction(add_test_binary)
 
 # Credit: http://stackoverflow.com/questions/9303711 
@@ -56,3 +56,4 @@ endfunction(add_standard_test)
 
 add_standard_test(BuildCheck)
 add_memcheck_test(BuildCheckMem)
+add_memcheck_test(BuildCheckVersion)

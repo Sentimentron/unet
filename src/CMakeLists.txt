@@ -31,5 +31,29 @@ file(GLOB unet_HEADERS
     "../include/unet/*.hpp"
 )
 
-add_library(libunet ${unet_SRC} ${unet_HEADERS})
-add_library(libunets STATIC ${unet_SRC} ${unet_HEADERS})
+FILE(WRITE ${CMAKE_BINARY_DIR}/version.h.in
+"\#define VERSION \"@VERSION@\"\n"
+)
+FILE(WRITE ${CMAKE_BINARY_DIR}/version.cmake
+"EXECUTE_PROCESS(
+     COMMAND \"./version.sh\"
+     OUTPUT_VARIABLE VERSION
+     OUTPUT_STRIP_TRAILING_WHITESPACE
+ )
+ CONFIGURE_FILE(\${SRC} \${DST} @ONLY)
+")
+INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
+ADD_CUSTOM_TARGET(
+    version
+    ${CMAKE_COMMAND} -D SRC=${CMAKE_BINARY_DIR}/version.h.in
+                     -D DST=${CMAKE_BINARY_DIR}/version.h
+                     -P ${CMAKE_BINARY_DIR}/version.cmake
+)
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+
+add_library(unet SHARED ${unet_SRC} ${unet_HEADERS} "version.h")
+add_library(unets STATIC ${unet_SRC} ${unet_HEADERS} "version.h")
+
+add_dependencies(unet version)
+add_dependencies(unets version)

@@ -33,7 +33,11 @@ endif()
 
 enable_testing()
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
+link_directories(${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
 
 add_subdirectory(src)

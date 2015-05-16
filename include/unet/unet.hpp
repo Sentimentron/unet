@@ -38,6 +38,8 @@ namespace unet {
     // Set a new default logging function, and return a pointer to the previous
     // one, if defined.
     UserLoggingFunction SetCustomLoggingFunction(UserLoggingFunction f); 
+    // Print the version
+    void LogPrintVersion(void);
 
 }
 

@@ -24,60 +24,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cstdarg>
-#include <pthread.h>
-#include <stdio.h>
+///
+/// This program deliberately does nothing. It exists to check whether the
+/// build system functions correctly.
+///
 
 #include <unet/unet.hpp>
-#include "version.h"
 
 using namespace unet;
 
-static UserLoggingFunction userLogFunction;
-static pthread_mutex_t uNetConfigurationLock = PTHREAD_MUTEX_INITIALIZER;
-
-/// Set a new default logging function and return a pointer to the
-/// previous one.
-UserLoggingFunction SetCustomLoggingFunction(UserLoggingFunction f) {
-    UserLoggingFunction ret = nullptr;
-    pthread_mutex_lock(&uNetConfigurationLock);
-    ret = userLogFunction;
-    userLogFunction = f;
-    pthread_mutex_unlock(&uNetConfigurationLock);
-    return ret;
-
-}
-
-static const char *LogLevelToString(LogLevel l) {
-    switch(l) {
-        case DEBUG:
-            return "DEBUG";
-        case INFO:
-            return "INFO";
-        case ERROR:
-            return "ERROR";
-        case FATAL:
-            return "FATAL";
-        default:
-            return "UNKNOWN";
-    }
-}
-
-void Log(LogLevel l, const char *fmt...) {
-
-    va_list args;
-    va_start(args, fmt);
-
-    if (userLogFunction != nullptr) {
-        userLogFunction(l, fmt, args);
-    } else {
-        fprintf(stderr, "μNet/%s", LogLevelToString(l));
-        vfprintf(stderr, fmt, args);
-    }
-
-    va_end(args);
-}
-
-void unet::LogPrintVersion(void) {
-    Log(INFO, "μNet %s", VERSION);
+int main(int argc, char **argv) {
+    LogPrintVersion();
+    return 0;
 }
