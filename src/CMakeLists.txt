@@ -31,17 +31,6 @@ file(GLOB unet_HEADERS
     "../include/unet/*.hpp"
 )
 
-FILE(WRITE ${CMAKE_BINARY_DIR}/version.h.in
-"\#define VERSION \"@VERSION@\"\n"
-)
-FILE(WRITE ${CMAKE_BINARY_DIR}/version.cmake
-"EXECUTE_PROCESS(
-     COMMAND \"./version.sh\"
-     OUTPUT_VARIABLE VERSION
-     OUTPUT_STRIP_TRAILING_WHITESPACE
- )
- CONFIGURE_FILE(\${SRC} \${DST} @ONLY)
-")
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
 ADD_CUSTOM_TARGET(
     version

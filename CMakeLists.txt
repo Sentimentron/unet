@@ -36,9 +36,17 @@ enable_testing()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+exec_program(
+     "bash"
+     ${CMAKE_CURRENT_SOURCE_DIR}
+     ARGS "version.sh"
+     OUTPUT_VARIABLE VERSION)
+
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 link_directories(${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
+add_definitions( -DGIT_VERSION="${VERSION}" )
 
 add_subdirectory(src)
 add_subdirectory(tests)
