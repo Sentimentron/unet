@@ -27,7 +27,9 @@ enable_testing()
 
 function(add_test_binary name)
     add_executable(test_${name} ${name}.cpp)
-    target_link_libraries(test_${name} ${UNET_LIBRARIES})
+    add_executable(test_${name}_s ${name}.cpp)
+    target_link_libraries(test_${name} ${UNET_LIBRARIES} libunet)
+    target_link_libraries(test_${name}_s ${UNET_LIBRARIES} libunets)
 endfunction(add_test_binary)
 
 # Credit: http://stackoverflow.com/questions/9303711 
@@ -49,6 +51,7 @@ endfunction(set_memcheck_test_properties)
 function (add_standard_test name)
     add_test_binary(${name})
     add_test(test_${name} test_${name})
+    add_test(test_static_${name}_s test_${name}_s)
 endfunction(add_standard_test)
 
 add_standard_test(BuildCheck)
