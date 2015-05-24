@@ -41,6 +41,17 @@ namespace unet {
     // Print the version
     void LogPrintVersion(void);
 
+    // Activation functions modify the result of each layer.
+    typedef void (*DoubleActivationFunction)(double *,double *);
+    typedef void (*FloatActivationFunction)(float *, float *);
+    const int FunctionIsVectorised = 0x1;
+    const int FunctionRequiresGPU  = 0x2; 
+
+    // Error functions compare the output of the final
+    // layer with a reference.
+    typedef double (*DoubleErrorFunction)(double *);
+    typedef float (*FloatErrorFunction)(float *); 
+
 }
 
 #endif
