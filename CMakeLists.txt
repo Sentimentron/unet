@@ -36,11 +36,12 @@ enable_testing()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-exec_program(
+exec_program (
      "bash"
      ${CMAKE_CURRENT_SOURCE_DIR}
      ARGS "version.sh"
-     OUTPUT_VARIABLE VERSION)
+     OUTPUT_VARIABLE VERSION
+)
 
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
