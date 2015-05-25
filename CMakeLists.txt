@@ -36,6 +36,7 @@ enable_testing()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+# Configure version information
 exec_program (
      "bash"
      ${CMAKE_CURRENT_SOURCE_DIR}
@@ -43,11 +44,19 @@ exec_program (
      OUTPUT_VARIABLE VERSION
 )
 
+list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+find_package (OpenCL 1.2 REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 link_directories(${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
 add_definitions( -DGIT_VERSION="${VERSION}" )
+if (OPENCL_FOUND) 
+    MESSAGE( STATUS "OpenCL is available" )
+    add_definitions(-DUNET_OPENCL_AVAILABLE)
+else(OPENCL_FOUND)
+    MESSAGE( STATUS "OpenCL unavailable" )
+endif (OPENCL_FOUND)
 
 add_subdirectory(src)
 add_subdirectory(tests)

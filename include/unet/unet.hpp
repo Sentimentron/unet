@@ -52,6 +52,8 @@ namespace unet {
     typedef double (*DoubleErrorFunction)(double *);
     typedef float (*FloatErrorFunction)(float *); 
 
+    // Returns true if OpenCL is supported on this system
+    bool OpenCLSupported(void);
 }
 
 #endif
