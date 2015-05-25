@@ -38,5 +38,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 add_library(unet SHARED ${unet_SRC} ${unet_HEADERS})
 add_library(unets STATIC ${unet_SRC} ${unet_HEADERS})
 
+IF (OPENCL_FOUND)
+target_link_libraries (unet ${OPENCL_LIBRARIES})
+target_link_libraries (unets ${OPENCL_LIBRARIES})
+ENDIF(OPENCL_FOUND)
+
 add_dependencies(unet version)
 add_dependencies(unets version)

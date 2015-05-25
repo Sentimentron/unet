@@ -27,8 +27,11 @@
 #include <cstdarg>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <unet/unet.hpp>
+
+#include "internal.hpp"
 
 using namespace unet;
 
@@ -62,7 +65,7 @@ static const char *LogLevelToString(LogLevel l) {
     }
 }
 
-void Log(LogLevel l, const char *fmt...) {
+void unet::Log(LogLevel l, const char *fmt...) {
 
     va_list args;
     va_start(args, fmt);
@@ -75,6 +78,11 @@ void Log(LogLevel l, const char *fmt...) {
     }
 
     va_end(args);
+}
+
+void unet::AssertFailure(const char *cond, const char *file, int line) {
+    Log(FATAL, "unet::AssertionFailure at %s:%d (%s)", file, line, cond);
+    exit(1);
 }
 
 void unet::LogPrintVersion(void) {
