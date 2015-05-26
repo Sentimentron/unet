@@ -8,7 +8,7 @@ void AssertFailure(const char *, const char *, int);
 
 #define UASSERT(cond) \
     do { \
-        AssertFailure(#cond, __FILE__, __LINE__); \
+        if (!(cond)) AssertFailure(#cond, __FILE__, __LINE__); \
     } while (0)
 }
 
