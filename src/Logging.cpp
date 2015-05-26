@@ -73,7 +73,7 @@ void unet::Log(LogLevel l, const char *fmt...) {
     if (userLogFunction != nullptr) {
         userLogFunction(l, fmt, args);
     } else {
-        fprintf(stderr, "μNet/%s ", LogLevelToString(l));
+        fprintf(stderr, "μNet/%s", LogLevelToString(l));
         vfprintf(stderr, fmt, args);
     }
 
@@ -81,7 +81,7 @@ void unet::Log(LogLevel l, const char *fmt...) {
 }
 
 void unet::AssertFailure(const char *cond, const char *file, int line) {
-    Log(FATAL, "unet::AssertionFailure at %s:%d (%s)", file, line, cond);
+    Log(FATAL, "unet::AssertionFailure at %s:%d (%s)\n", file, line, cond);
     exit(1);
 }
 
