@@ -12,6 +12,27 @@ int OpenCLNetworkFunction::activeOpenCLNetworkFunctions = 0;
 cl_uint OpenCLNetworkFunction::numDevices = 0;
 cl_uint OpenCLNetworkFunction::numPlatforms = 0;
 
+static const char *clGetStatus(cl_int status) {
+    switch(status) {
+        case CL_SUCCESS:
+            return "CL_SUCCESS";
+        case CL_INVALID_PROGRAM:
+            return "CL_INVALID_PROGRAM";
+        case CL_INVALID_PROGRAM_EXECUTABLE:
+            return "CL_INVALID_PROGRAM_EXECUTABLE";
+        case CL_INVALID_KERNEL_NAME:
+            return "CL_INVALID_KERNEL_NAME";
+        case CL_INVALID_KERNEL_DEFINITION:
+            return "CL_INVALID_KERNEL_DEFINITION";
+        case CL_INVALID_VALUE:
+            return "CL_INVALID_VALUE";
+        case CL_OUT_OF_HOST_MEMORY:
+            return "CL_OUT_OF_HOST_MEMORY";
+        default:
+            return "Unrecognised cl_status";
+    }
+}
+
 bool unet::OpenCLNetworkFunction::Initialize() {
     cl_int ret; 
 
@@ -112,8 +133,11 @@ NetworkFunction* unet::NetworkFunction::FromOpenCLKernel (
 
     // Create the kernel
     cl_kernel kernel = clCreateKernel(program, kernelName, &ret);
-    UASSERT(ret == CL_SUCCESS);
-
+    if (ret != CL_SUCCESS) {
+        Log(FATAL, "clCreateKernel failure: error was '%s'", 
+                clGetStatus(ret));
+        return nullptr;
+    }
     out->program = program;
     out->kernel = kernel;
 

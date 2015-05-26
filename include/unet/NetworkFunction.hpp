@@ -18,6 +18,8 @@ class NetworkFunction {
                 const char *kernelSource,
                 const char *kernelName
             );
+
+        virtual ~NetworkFunction() = 0;
 };
 }
 #endif
