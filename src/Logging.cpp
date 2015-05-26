@@ -73,8 +73,9 @@ void unet::Log(LogLevel l, const char *fmt...) {
     if (userLogFunction != nullptr) {
         userLogFunction(l, fmt, args);
     } else {
-        fprintf(stderr, "μNet/%s", LogLevelToString(l));
+        fprintf(stderr, "μNet/%s ", LogLevelToString(l));
         vfprintf(stderr, fmt, args);
+        fprintf(stderr, "\n");
     }
 
     va_end(args);
@@ -88,3 +89,4 @@ void unet::AssertFailure(const char *cond, const char *file, int line) {
 void unet::LogPrintVersion(void) {
     Log(INFO, "μNet %s\n", GIT_VERSION);
 }
+
