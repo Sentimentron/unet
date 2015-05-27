@@ -16,10 +16,22 @@ static const char *clGetStatus(cl_int status) {
     switch(status) {
         case CL_SUCCESS:
             return "CL_SUCCESS";
+        case CL_INVALID_ARG_INDEX:
+            return "CL_INVALID_ARG_INDEX";
+        case CL_INVALID_ARG_VALUE:
+            return "CL_INVALID_ARG_VALUE";
+        case CL_INVALID_MEM_OBJECT:
+            return "CL_INVALID_MEM_OBJECT";
+        case CL_INVALID_SAMPLER:
+            return "CL_INVALID_SAMPLER";
+        case CL_INVALID_ARG_SIZE:
+            return "CL_INVALID_ARG_SIZE";
         case CL_INVALID_PROGRAM:
             return "CL_INVALID_PROGRAM";
         case CL_INVALID_PROGRAM_EXECUTABLE:
             return "CL_INVALID_PROGRAM_EXECUTABLE";
+        case CL_INVALID_KERNEL:
+            return "CL_INVALID_KERNEL";
         case CL_INVALID_KERNEL_NAME:
             return "CL_INVALID_KERNEL_NAME";
         case CL_INVALID_KERNEL_DEFINITION:
@@ -81,18 +93,24 @@ bool OpenCLNetworkFunction::Execute (
     // Assumption: in and out are both on the device 
     cl_mem inputMem = gcl_create_buffer_from_ptr(in);
     cl_mem outputMem = gcl_create_buffer_from_ptr(out);
-    ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&inputMem);
-    UASSERT(ret == CL_SUCCESS);
-    ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&outputMem);
-    UASSERT(ret == CL_SUCCESS);
+    ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), in);
+    if (ret != CL_SUCCESS) {
+        Log(FATAL, "clSetKernelArg error: %s", clGetStatus(ret));
+        return false;
+    }
     
     size_t globalWorkSize[3] = {(size_t)in_size, 0, 0};
     size_t localWorkSize[3] = {(size_t)in_size, 0, 0};
 
     ret = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
+    if (ret != CL_SUCCESS) { 
+        Log(FATAL, "clEnqueNDRangeKernel error: %s", clGetStatus(ret));
+        return false;
+    }
     UASSERT(ret == CL_SUCCESS);
-
     clWaitForEvents(1, &event);
+    clReleaseMemObject(inputMem);
+    clReleaseMemObject(outputMem);
     return true;
 }
 
