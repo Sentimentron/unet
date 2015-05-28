@@ -28,6 +28,7 @@ class OpenCLNetworkFunction : NetworkFunction {
         static cl_command_queue commandQueue;
         static cl_uint numDevices;
         static cl_uint numPlatforms;
+        static size_t maxWorkGroupSize[3];
         static int activeOpenCLNetworkFunctions;
 
     friend NetworkFunction;

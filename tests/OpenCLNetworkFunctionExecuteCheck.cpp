@@ -16,13 +16,13 @@ const char *kernel = "__kernel void doNothing(__global float* a) {\n"
 /// Check that we can create and release OpenCLNetworkFunction
 /// objects without leaking resources.
 int main(int argc, char **argv) {
+    dispatch_queue_t queue = gcl_create_dispatch_queue(CL_DEVICE_TYPE_GPU, NULL);
     NetworkFunction *nf = unet::NetworkFunction::FromOpenCLKernel(
             kernel, "doNothing"
         );
 
-
     // Create arrays
-    const int elements = 2048; 
+    const int elements = 64; 
     double *in = (double *)malloc(
             elements * sizeof(double)
         );
@@ -43,23 +43,16 @@ int main(int argc, char **argv) {
         fprintf(stderr, "gcl_malloc error!\n");
         return 1;
     }
-    double *dout = (double *)gcl_malloc(
-            elements * sizeof(double),
-            NULL, 
-            0
-        );
-    if (dout == NULL) {
-        fprintf(stderr, "gcl_malloc error! (dout)\n");
-        return 1;
-    }
 
     // Run the kernel
-    if (nf->Execute(din, dout, elements, elements)) {
+    if (!nf->Execute(din, din, elements, elements)) {
         fprintf(stderr, "Execution failure!\n");
         return 1;
     }
-
-    gcl_memcpy(out, dout, sizeof(double) * elements);
+    
+    dispatch_sync(queue, ^{
+        gcl_memcpy(out, din, sizeof(double) * elements);
+    });
 
     // Check the result, should be exactly the same
     for (int i = 0; i < elements; i++) {
@@ -74,7 +67,6 @@ int main(int argc, char **argv) {
     free(in);
     free(out);
     gcl_free(din);
-    gcl_free(dout);
 
     if (nf != nullptr) {
         delete nf;
