@@ -1,3 +1,5 @@
+#include <string.h>
+
 #ifdef UNET_OPENCL_AVAILABLE
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -69,12 +71,13 @@ bool unet::OpenCLDevice::AllocateOnDevice(size_t sz, cl_mem *out) {
 
 bool unet::OpenCLDevice::CopyFromDevice(void *dest, cl_mem src, size_t len) {
     cl_int ret;
+    void *buf;
     // Create a cl_mem representing the src pointer
     cl_mem tmp = clCreateBuffer (
             this->context,                           // context
-            CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, // flags
+            CL_MEM_WRITE_ONLY,                       // flags
             len,                                     // size
-            dest,                                    // host pointer
+            NULL,                                    // host pointer
             &ret                                     // error code
         );
     if (ret != CL_SUCCESS) {
@@ -82,11 +85,11 @@ bool unet::OpenCLDevice::CopyFromDevice(void *dest, cl_mem src, size_t len) {
         return false;
     }
 
-    // Copy the src mem to the device
+    // Copy the mem somewhere temporary on the device
     ret = clEnqueueCopyBuffer (
             this->commandQueue, // command_queue 
             src,                // src_buffer
-            tmp,               // dst_buffer
+            tmp,                // dst_buffer
             0,                  // src_offset
             0,                  // dst_offset
             len,                // cb (byte count)
@@ -97,6 +100,7 @@ bool unet::OpenCLDevice::CopyFromDevice(void *dest, cl_mem src, size_t len) {
     bool status = false;
     if (ret != CL_SUCCESS) {
         Log(FATAL, "clEnqueueCopyBuffer failed (%s)", clGetStatus(ret));
+        goto release;
     } else {
         // Wait for the copy to complete
         ret = clEnqueueBarrierWithWaitList(
@@ -106,8 +110,45 @@ bool unet::OpenCLDevice::CopyFromDevice(void *dest, cl_mem src, size_t len) {
                 NULL                // event
             );
         UASSERT(ret == CL_SUCCESS);
-    } 
+        status = true;
+    }
 
+    // Map the buffer into the host
+    buf = clEnqueueMapBuffer (
+            this->commandQueue, // command_queue
+            tmp,                // buffer
+            CL_TRUE,            // blocking_map
+            CL_MAP_READ,        // flags
+            0,                  // offset
+            len,                // len
+            0,                  // num_events_in_wait_list
+            NULL,               // event_wait_list
+            NULL,               // event
+            &ret                // errcode_ret
+        );
+    if (buf == NULL) {
+        Log(FATAL, "clEnqueueMapBuffer error, status: %s'", 
+                clGetStatus(ret)
+        );
+        status = false;
+        goto release;
+    }
+
+    // Copy from temporary device mem to host
+    memcpy(dest, buf, len);
+
+    ret = clEnqueueUnmapMemObject (
+            this->commandQueue, // command_queue
+            tmp,                // memobj
+            buf,                // mapped_ptr
+            0,                  // num_events_in_wait_list
+            NULL,               // event_wait_list
+            NULL                // cl_event
+        );  
+    UASSERT(ret == CL_SUCCESS);
+
+
+release:
     // Release temporary memory object
     ret = clReleaseMemObject(tmp);
     UASSERT(ret == CL_SUCCESS);
