@@ -2,7 +2,7 @@
 #define __H_UNET_OPENCL_DEVICE__
 
 #ifdef UNET_OPENCL_AVAILABLE
-#ifdef APPLE
+#ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
 #include <CL/cl.h>
@@ -20,23 +20,24 @@ namespace unet {
             char deviceExtensions[STRMAX];
             cl_uint maxComputeUnits;
             cl_ulong globalMemSize;
-            size_t maxWorkgroupSize;
             cl_device_local_mem_type localMemType;
             cl_ulong localMemSize;
 
-            static size_t maxGroupWorkSize[3];
+            size_t maxGroupWorkSize[3];
         
             // Memory management
-            void *AllocateOnDevice(size_t len);
-            void CopyToDevice(void *dest, void *src, size_t len);
-            void FreeOnDevice(void *mem);
+            bool AllocateOnDevice(size_t len, cl_mem *out);
+            bool CopyToDevice(cl_mem dest, void *src, size_t len);
+            bool CopyFromDevice(void *dest, cl_mem src, size_t len);
+            bool FreeOnDevice(cl_mem mem);
 
-            const char *statusAsString(cl_int status);
             static OpenCLDevice *Initialize(cl_device_id device);
             ~OpenCLDevice();
         private:
             OpenCLDevice();
-    }
+            cl_context context;
+            cl_command_queue commandQueue;
+    };
 }
 
 #else
