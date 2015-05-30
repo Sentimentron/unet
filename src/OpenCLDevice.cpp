@@ -4,8 +4,10 @@
 #else
 #include <CL/cl.h>
 #endif
+
+#include <unet/OpenCLDevice.hpp>
+
 #include "internal.hpp"
-#include "OpenCLDevice.hpp"
 
 static const char *clGetStatus(cl_int status) {
     switch(status) {
