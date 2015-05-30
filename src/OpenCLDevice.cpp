@@ -6,6 +6,7 @@
 #endif
 #include "internal.hpp"
 #include "OpenCLDevice.hpp"
+
 static const char *clGetStatus(cl_int status) {
     switch(status) {
         case CL_INVALID_ARG_INDEX: return "CL_INVALID_ARG_INDEX";
@@ -38,6 +39,13 @@ static const char *clGetStatus(cl_int status) {
         default:
             return "Unrecognised cl_status";
     }
+}
+
+void unet::OpenCLDevice::PrintInfo() {
+    Log(INFO, "device vendor: %s", this->vendorName);
+    Log(INFO, "device name: %s", this->deviceName);
+    Log(INFO, "device version: %s", this->deviceVersion);
+    Log(INFO, "device extensions: %s", this->deviceExtensions);
 }
 
 bool unet::OpenCLDevice::AllocateOnDevice(size_t sz, cl_mem *out) {

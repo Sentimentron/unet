@@ -24,7 +24,10 @@ namespace unet {
             cl_ulong localMemSize;
 
             size_t maxGroupWorkSize[3];
-        
+       
+            // Device info print 
+            void PrintInfo();
+
             // Memory management
             bool AllocateOnDevice(size_t len, cl_mem *out);
             bool CopyToDevice(cl_mem dest, void *src, size_t len);
