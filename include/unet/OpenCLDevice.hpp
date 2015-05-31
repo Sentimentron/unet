@@ -1,7 +1,6 @@
 #ifndef __H_UNET_OPENCL_DEVICE__
 #define __H_UNET_OPENCL_DEVICE__
 
-#ifdef UNET_OPENCL_AVAILABLE
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
@@ -45,5 +44,4 @@ namespace unet {
 
 #else
 /* Deliberately nothing here */
-#endif /*UNET_OPENCL_AVAILABLE */
 #endif /*__H_UNET_OPENCL_DEVICE__ */
