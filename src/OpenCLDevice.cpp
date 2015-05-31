@@ -52,6 +52,50 @@ void unet::OpenCLDevice::PrintInfo() {
     Log(INFO, "device extensions: %s", this->deviceExtensions);
 }
 
+cl_kernel unet::OpenCLDevice::CompileKernel(const char *src,
+        const char *name) {
+   
+    cl_int ret; 
+
+    // Find the kernel length
+    size_t kernelLength = strlen(src);
+
+    // Create the program 
+    cl_program program = clCreateProgramWithSource(
+            this->context,
+            1,
+            (const char **)&src,
+            (const size_t *)&kernelLength,
+            &ret
+    );
+    if (ret != CL_SUCCESS) {
+        Log(FATAL, "program create error: '%s'", clGetStatus(ret));
+        return NULL;
+    }
+
+    // Build the kernel program 
+    ret = clBuildProgram(
+            program,
+            1, 
+            &this->deviceId,
+            NULL,
+            NULL,
+            NULL
+        );
+    if (ret != CL_SUCCESS) {
+        Log(FATAL, "kernel error '%s'", clGetStatus(ret));
+        return NULL;
+    }
+
+    cl_kernel kernel = clCreateKernel(program, name, &ret);
+    if (ret != CL_SUCCESS) {
+        Log(FATAL, "kernel error: '%s'", clGetStatus(ret));
+        return NULL;
+    }
+    
+    return kernel;
+}
+
 bool unet::OpenCLDevice::AllocateOnDevice(size_t sz, cl_mem *out) {
     cl_int ret;
     *out = clCreateBuffer(
@@ -255,6 +299,7 @@ unet::OpenCLDevice *unet::OpenCLDevice::Initialize(cl_device_id id) {
         );
     UASSERT(ret == CL_SUCCESS);
 
+    d->deviceId = id;
     return d;
 }
 

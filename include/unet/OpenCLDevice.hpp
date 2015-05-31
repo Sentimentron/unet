@@ -33,12 +33,15 @@ namespace unet {
             bool CopyFromDevice(void *dest, cl_mem src, size_t len);
             bool FreeOnDevice(cl_mem mem);
 
+            cl_kernel CompileKernel(const char *src, const char *name);
+
             static OpenCLDevice *Initialize(cl_device_id device);
             ~OpenCLDevice();
-        private:
-            OpenCLDevice();
             cl_context context;
             cl_command_queue commandQueue;
+            cl_device_id deviceId;
+        private:
+            OpenCLDevice();
     };
 }
 

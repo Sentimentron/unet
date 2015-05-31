@@ -54,6 +54,9 @@ namespace unet {
 
     // Returns true if OpenCL is supported on this system
     bool OpenCLSupported(void);
+
+    // Function for testing
+    void PropagateXOR(double *input, double *out);
 }
 
 #endif
